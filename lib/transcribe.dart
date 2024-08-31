@@ -16,6 +16,8 @@ class _ModelScreenState extends State<ModelScreen> {
   String? smallModel;
   Recognizer? recognizer;
   Model? model;
+  TextEditingController textController = TextEditingController();
+  SpeechService? speechService;
 
   @override
   void initState() {
@@ -38,15 +40,39 @@ class _ModelScreenState extends State<ModelScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: ElevatedButton(
-            onPressed: () async {
-              log("Start Listening");
-              final speechService = await vosk!.initSpeechService(recognizer!);
-              speechService.onPartial().forEach((partial) => print(partial));
-              speechService.onResult().forEach((result) => print(result));
-              await speechService.start();
-            },
-            child: Text('Transcribe Audio')),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            TextFormField(
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+              ),
+              controller: textController,
+            ),
+            ElevatedButton(
+                onPressed: () async {
+                  log("Start Listening");
+                  speechService = await vosk!.initSpeechService(recognizer!);
+                  setState(() {});
+                  speechService!.onPartial().forEach((partial) {
+                    textController.text += partial;
+                    setState(() {});
+                  });
+                  speechService!
+                      .onResult()
+                      .forEach((result) => log("Result: $result"));
+                  await speechService!.start();
+                },
+                child: Text('Transcribe Audio')),
+            ElevatedButton(
+                onPressed: () async {
+                  log("Stop Listening");
+
+                  await speechService!.stop();
+                },
+                child: Text('Stop Transcription')),
+          ],
+        ),
       ),
     );
   }

@@ -12,6 +12,7 @@ class SynthesizeScreen extends StatefulWidget {
 
 class _SynthesizeScreenState extends State<SynthesizeScreen> {
   FlutterTts flutterTts = FlutterTts();
+  TextEditingController textController = TextEditingController();
   Future _speak(String text) async {
     var result = await flutterTts.speak(text);
   }
@@ -37,11 +38,23 @@ class _SynthesizeScreenState extends State<SynthesizeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Center(
-            child: ElevatedButton(
-                onPressed: () async {
-                  log('Start Speaking');
-                  await _speak("Hello, I am speaking");
-                },
-                child: Text('Synthesize Audio'))));
+            child: Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        TextField(
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: 'Enter Text to Synthesize',
+          ),
+          controller: textController,
+        ),
+        ElevatedButton(
+            onPressed: () async {
+              log('Start Speaking');
+              await _speak(textController.text);
+            },
+            child: Text('Synthesize Audio')),
+      ],
+    )));
   }
 }

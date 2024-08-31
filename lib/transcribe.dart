@@ -12,11 +12,6 @@ class ModelScreen extends StatefulWidget {
 }
 
 class _ModelScreenState extends State<ModelScreen> {
-  FlutterTts flutterTts = FlutterTts();
-  Future _speak() async {
-    var result = await flutterTts.speak("Hello World      ");
-  }
-
   VoskFlutterPlugin? vosk;
   String? smallModel;
   Recognizer? recognizer;
@@ -34,15 +29,7 @@ class _ModelScreenState extends State<ModelScreen> {
         model: model!,
         sampleRate: 10000,
       );
-      List<dynamic> languages = await flutterTts.getLanguages;
-      log(languages.toString());
-      await flutterTts.setLanguage("en-US");
 
-      await flutterTts.setSpeechRate(0.6);
-
-      await flutterTts.setVolume(1.0);
-
-      await flutterTts.setPitch(0.5);
       setState(() {});
     });
   }
@@ -50,17 +37,16 @@ class _ModelScreenState extends State<ModelScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // log("Start Listening");
-          // final speechService = await vosk!.initSpeechService(recognizer!);
-          // speechService.onPartial().forEach((partial) => print(partial));
-          // speechService.onResult().forEach((result) => print(result));
-          // await speechService.start();
-          log('Start Speaking');
-          await _speak();
-        },
-        child: Icon(Icons.mic),
+      body: Center(
+        child: ElevatedButton(
+            onPressed: () async {
+              log("Start Listening");
+              final speechService = await vosk!.initSpeechService(recognizer!);
+              speechService.onPartial().forEach((partial) => print(partial));
+              speechService.onResult().forEach((result) => print(result));
+              await speechService.start();
+            },
+            child: Text('Transcribe Audio')),
       ),
     );
   }
